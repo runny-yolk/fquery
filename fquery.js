@@ -84,7 +84,23 @@ void function(){
             }
         }
 
-        var atype = tCheck(action, 'Action', 'number function array string');
+        atype = type(action);
+
+        if(atype === 'array'){
+            if(type(action[0]) === 'array'){
+                var rtn = this;
+                while(action[0] && type(action[0]) === 'array'){
+                    var thing = action.shift();
+                    rtn = doAction.apply(rtn, thing);
+                    if(type(rtn) === 'function') rtn = rtn();
+                    else return rtn;
+                }
+                return fQuery(rtn);
+            }
+            else return doAction.apply(action.shift(), action.concat(acargs));
+        }
+
+        atype = tCheck(action, 'Action', 'number function string');
 
         if(atype === 'number'){
             var num = action;
@@ -102,22 +118,6 @@ void function(){
             for(var p = 0; p < this.length; p++) if(cb.apply(0, [this[p], p].concat(acargs)) !== false) rtn.push(this[p]);
             return fQuery(rtn);
         }
-        else if(atype === 'array'){
-            var acarr = action;
-            if(type(acarr[0]) === 'array'){
-                var rtn = this;
-                while(acarr[0] && type(acarr[0]) === 'array'){
-                    var thing = acarr.shift();
-                    rtn = doAction.apply(rtn, thing);
-                    if(type(rtn) === 'function') rtn = rtn();
-                    else return rtn;
-                }
-                return fQuery(rtn);
-            } else {
-                action = acarr.shift();
-                acargs = acarr.concat(acargs);
-            }
-        }
 
         var props = action.split('.');
         for(var p = 0; p < props.length; p++) {
@@ -132,7 +132,7 @@ void function(){
             // Gets the object the action is being done on
             // eg for classList.add, the actioned object is the classList, not the element
             var obj = this[i];
-            for(var p = 0; p < props.length; p++) if(p < props.length-1) obj = obj[ props[p] ];
+            for(var p = 0; p < props.length - 1; p++) obj = obj[ props[p] ];
             
             // Handles the action being done, behaves differently based on type
             var ac = obj[actionName];
@@ -149,8 +149,8 @@ void function(){
                 var arg = acargs[0];
 
                 if(typeof arg === 'function') {
-                    var frtn = arg.apply(fQuery(this[i]), [ac, i].concat(acargs.slice(1)));
-                    if(frtn !== undefined) obj[actionName] === frtn;
+                    var frtn = arg.apply(0, [ac, i, obj, this[i]].concat(acargs.slice(1)));
+                    if(frtn !== undefined) obj[actionName] = frtn;
                 }
                 else if(typeof arg === 'object' && typeof ac === 'object') {
                     var kys = Object.keys(arg);
@@ -191,7 +191,7 @@ void function(){
         if(itype === 'array') arr = input;
         else if (itype === 'element') arr = [input];
         else if (itype === 'string') {
-            if(context === true) {
+            if(context === false) {
                 // t for temporary
                 var t = document.createElement('div');
                 t.insertAdjacentHTML('afterbegin', input);
@@ -263,6 +263,7 @@ void function(){
         width: 'offsetWidth',
         height: 'offsetHeight',
         val: 'value',
+        kids: 'children',
         '+-class': 'classList.toggle',
         '+class': 'classList.add',
         '-class': 'classList.remove',
@@ -304,10 +305,10 @@ void function(){
         '?': function(){
             return Boolean(this[0]);
         },
-        'has': function(val){
+        has: function(val){
             return this.indexOf(val) > -1;
         },
-        'index': function(){
+        index: function(){
             var el = this[0];
             if(!el || !el.parentElement) return -1;
             return toArr(el.parentElement.children).indexOf(el);
