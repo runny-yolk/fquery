@@ -289,6 +289,6 @@ If the string refers to a function, then `acargs` is used as a list of arguments
 
 If the string refers to *a function that returns, or a property that is* an element, an array, or an array-like object (such as a `NodeList`), then for every element in the `this` array, a return array will be added to, with duplicates filtered out. `doAction` will then return with another instance of `doAction`, with the return array bound as `this`. This rule is what allows `querySelectorAll`, `children`, `parentElement`, etc, to work.
 
-`doAction` will only return the result of a function call when the function is a property of the element directly, not when the function is a property of a property of the element. For example, `querySelectorAll` will return an instance of `doAction` with the result of the function call bound to `this`, but `firstChild.querySelectorAll` will not.
+`doAction` will only return the result of a function call when the function is a property of the element directly, not when the function is a property of a property of the element. For example, `querySelectorAll` will work as described above, but `firstChild.querySelectorAll` will not.
 
 If, after running the above, `doAction` has nothing else to return, it will just return another instance of itself, with the same `this` array bound.
