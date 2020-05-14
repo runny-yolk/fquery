@@ -191,7 +191,7 @@ void function(){
         if(itype === 'array') arr = input;
         else if (itype === 'element') arr = [input];
         else if (itype === 'string') {
-            if(input[0] === '<') {
+            if(context === true) {
                 // t for temporary
                 var t = document.createElement('div');
                 t.insertAdjacentHTML('afterbegin', input);
@@ -222,22 +222,23 @@ void function(){
     }
 
 
-    var getInsert = function(item, safe){
+    var getInsert = function(item, safety){
+		safety = safety || true;
         var itype = type(item),
             pos = this;
 
-        if(itype === 'function') return getInsert.call(pos, item(), safe);
+        if(itype === 'function') return getInsert.call(pos, item(), safety);
 
         if(itype === 'string') {
-            // set safe to true for XSS prevention
-            if(safe) return ['insertAdjacentText', pos];
+            // safety defaults to true, for XSS prevention
+            if(safety) return ['insertAdjacentText', pos];
             else return ['insertAdjacentHTML', pos];
         }
         
         if(itype === 'element') return ['insertAdjacentElement', pos];
 
         if( has(['array', 'arraylike'], itype) ) return toArr(item).map(function(x){
-            return getInsert.call(pos, x, safe).concat([x]);
+            return getInsert.call(pos, x, safety).concat([x]);
         });
 
         // if no type is matched
@@ -274,11 +275,6 @@ void function(){
     }
 
     fQuery.iterators = {
-        filter: function(el, i, sel){
-            // IE compat
-            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
-            return match.call(el, sel);
-        },
         not: function(el, i, sel){
             // IE compat
             var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
