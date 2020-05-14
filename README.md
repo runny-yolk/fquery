@@ -10,7 +10,7 @@ The fQuery function is put on the global variable `fQuery`. For a more jQuery-li
 
 I always found two particular things the most useful from jQuery:
 * The ability to select a bunch of DOM elements and apply a change to all of them, without having to write a bunch of iterator functions, or a bunch of for loops
-* Being able to use the DOM APIs (The APIs that allow you to make changes to elements) without having to use them, since they can be very verbose
+* Being able to use the DOM APIs (The APIs that allow you to make changes to elements) without having to use them directly, since they can be very verbose
 
 Obviously jQuery has a bunch of other useful features, and fQuery is not designed to replicate all of them - it's just designed to fulfil the items above in the best possible way, with as little code as possible.
 
