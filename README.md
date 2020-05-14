@@ -74,7 +74,7 @@ Returns an instance of the `fQuery.doAction` function, with an array of elements
 
 **`context`**
 * Can be any object that implements the querySelectorAll API, is intended to be a `Document` or an `Element`.
-* Can also be the `boolean` value `false`, in which case, `input` is parsed as HTML, and the created `Node`s are the content of the `this` array.
+* Can also be the `boolean` value `false`, to indicate that context is irrelevant, in which case, `input` is parsed as HTML, and the created `Node`s are the content of the `this` array.
 * Defaults to `window.document`
   
 ### fQuery.doAction(\[action\[, . . .acargs\]\])
