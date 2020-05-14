@@ -91,8 +91,8 @@ void function(){
             var end = acargs[0];
             if(end === null) return fQuery(this.slice(num));
             else if(type(end) !== 'number') {
-                if(!has(['undefined', 'null'], type(this[num])) ) return fQuery([]);
-                else return fQuery([this[num]]);
+                if(!has(['undefined', 'null'], type(this[num])) ) return fQuery([this[num]]);
+                else return fQuery([]);
             }
             else return fQuery(this.slice(num, end));
         }
@@ -104,9 +104,9 @@ void function(){
         }
         else if(atype === 'array'){
             var acarr = action;
-            if(type(action[0]) === 'array'){
+            if(type(acarr[0]) === 'array'){
                 var rtn = this;
-                while(acarr[0]){
+                while(acarr[0] && type(acarr[0]) === 'array'){
                     var thing = acarr.shift();
                     rtn = doAction.apply(rtn, thing);
                     if(type(rtn) === 'function') rtn = rtn();
