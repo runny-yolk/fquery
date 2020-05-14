@@ -283,6 +283,7 @@ $('div')('dataset', {foo:"bar"});
 // CSS, you know this
 $('div')('style', {border:"1px solid black"});
 ```
+* Otherwise, the property is set to the value of `acargs[0]`
 
 If the string refers to a function, then `acargs` is used as a list of arguments to call that function.
 
