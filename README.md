@@ -3,7 +3,7 @@ Fake-jQuery. A JS tool designed to replicate a good portion of the functionality
 
 Useful if you need a thin utility for prototyping, or you're building A/B tests for the web, and need utilities, and don't want to add too much bulk. It's also highly extensible.
 
-Disclaimer: While this tool is is very versatile and powerful, that comes at a cost, which is that it can be fragile if not used in the right way, and is *definitely* not type-safe. This is why it's reccomended for use for small or controlled use cases. Probably best not  use it in production.
+Disclaimer: While this tool is is very versatile and powerful, that comes at a cost, which is that it can be fragile if not used in the right way, and is *barely* type-controlled. This is why it's reccomended for use for small or controlled use cases. Probably best not  use it in production.
 
 ## How to use it
 The fQuery function is put on the global variable `fQuery`. For a more jQuery-like experience, you could do `window.$ = fQuery`. This isn't done by default, because fQuery should be non-conflicting by default.
