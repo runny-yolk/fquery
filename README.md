@@ -3,8 +3,6 @@ Fake-jQuery. A JS tool designed to replicate a good portion of the functionality
 
 Useful if you need a thin utility for prototyping, or you're building A/B tests for the web, and need utilities, and don't want to add too much bulk. It's also highly extensible.
 
-Disclaimer: While this tool is is very versatile and powerful, that comes at a cost, which is that it can be fragile if not used in the right way, and is *barely* type-controlled. This is why it's reccomended for use for small or controlled use cases. Probably best not  use it in production. Although, maybe this applies to all JavaScript.
-
 ## How to use it
 The fQuery function is put on the global variable `fQuery`. For a more jQuery-like experience, you could do `window.$ = fQuery`. This isn't done by default, to make fQuery non-conflicting by default.
 
@@ -23,7 +21,7 @@ The first is by providing a wrapper function, `fQuery.doAction`, for all changes
 This function is primarily designed to take a string as its first argument, called `action`. `action` typically refers to a property or method of the elements in the `this` array that you want to interact with. For example, if I wanted to use fQuery to add a class `foo` to every `div` on a page, I could do something like this:
 ```javascript
 var $ = fQuery;
-$('div')('classList.add', 'foo');
+fQuery('div')('classList.add', 'foo');
 ```
 
 fQuery recognises that `classList.add` is a function, and so for each element in the `this` array, calls the function, passing in `foo` as an argument.
@@ -32,20 +30,22 @@ So the first thing we wanted, selecting and applying changes to DOM elements as 
 
 `fQuery.alias` is a plain object that contains aliases for common DOM APIs, which you can easily add to for your own purposes. The keys are the alias names and the values are the real names.
 
+One of the default aliases is for `classList.add`, the alias for which is `+class`. If you were going to create this yourself, you would just do `fQuery.alias['+class'] = 'classList.add'` 
+
 So instead of using `classList.add`, we can now do:
 ```javascript
-$('div')('+class', 'foo');
+fQuery('div')('+class', 'foo');
 ```
 
-Since I haven't documented them yet, for all the default aliases, I would reccomend checking the source code. There are also some advanced ways they can be used, which will be explained further on. Also note that because we're using strings instead of property names, there are few limitations on what characters can be used, so `$('div')('+class', 'foo')` works, where `$('div').+class` would not.
+Since I haven't documented them yet, for all the default aliases, I would reccomend checking the source code. There are also some advanced ways they can be used, which will be explained further on.
 
 fQuery can also be used to get/set properties. For example:
 ```javascript
 // val is another default alias, short for "value"
 // sets all text inputs value as "foo"
-$('input[type=text]')('val', 'foo');
+fQuery('input[type=text]')('val', 'foo');
 // gets the value property of the first input
-$('input[type=text]')('val');
+fQuery('input[type=text]')('val');
 ```
 
 Because you can pass in strings to reference properties, fQuery is adaptable to a wide range of use cases, with minimal impact on page load, because there's no need to manually define getters/setters.
@@ -80,12 +80,15 @@ Returns an instance of the `fQuery.doAction` function, with an array of elements
 * Defaults to `window.document`
   
 ### fQuery.doAction(\[action\[, . . .acargs\]\])
+What this function returns is highly dependent on the arguments passed
 
-This function is difficult to document comprehensively, in a way that makes sense, due to the fact that it can do a lot of different things, depending on the arguments provided to it, which is mostly dependent on type. The below is, I think, a good first attempt.
+**`action`**
+* Can be any of the types listed below
 
-Feel free to read the source code if you want a fuller understanding - there isn't that much of it, after all.
+**`acargs`**
+* Every argument that comes after `action` will be put into an array called `acargs`, which is used differently depending on what is provided for `action`
 
-After `action`, the remaining arguments are put into an array called `acargs`, and are used differently depending on what `action` is provided.
+It can be difficult to fully grasp (and frankly, document) this function due to all the different things it does - feel free to read the source code if you want a fuller understanding - there isn't that much of it, after all.
 
 #### When `action` is `undefined`
 Returns `this`
@@ -108,6 +111,7 @@ $divs(2);
 // "Array.prototype.slice" is called with no second argument
 // therefore the array is sliced from the 3rd element to the end
 // see MDN documentation of "Array.prototype.slice" for more info
+// the fact that null is needed explicitly here isn't ideal, but is necessary to make sure the above functionality works
 $divs(2, null);
 // "Array.prototype.slice" is called with a second argument
 // therefore the array is sliced from the 3rd element to the 6th element
@@ -122,7 +126,7 @@ Returns an instance of the `fQuery.doAction` function, with an array of elements
 
 The `acargs` array is then used to populate the rest of the arguments to the callback, i.e., arguments provided after the callback are then passed to the callback, just like how arguments passed after the 2nd argument of `setTimeout` are then passed to the callback.
 
-If the callback returns `false`, then that element will not be included the array that gets bound to the return instance of `doAction`
+If the callback returns `false` (and it has to be the `boolean false`, not just a falsy value like `0` or `null`), then that element will not be included the array that gets bound to the return instance of `doAction`, making the function act like an iterator and a filter. If you're intending on using the function just as an iterator, make sure it never returns `false`
 ```javascript
 // returns a doAction instance where the "this" array contains all divs on the page
 var $divs = fQuery('div');
@@ -145,11 +149,9 @@ $divs(filterByChildNumber, 1);
 ```
 
 #### When `action` is `array`
-`action` is put into a variable called `acarr`
-`action` becomes `acarr[0]`
-`acargs` is then a concatenation of `acarr` and `acargs`
+doAction returns, with a new call to itself, with `action[0]` used as `action` in the new call, and the remaining elements of `action`+`acargs` becoming `acargs` for the new call.
 
-The easy way of thinking about it, is that this array works just like passing in a list of arguments, as you would normally, but because it's an array, can be modified programatically, or re-used.
+So if you passed in `['insertAdjacentText', 'afterend'], 'foo'`, it would work as if you had passed in `'insertAdjacentText', 'afterend', 'foo'`
 
 The purpose of this is that you can make an array, with pre-loaded arguments and functionality, for easy re-use.
 ```javascript
@@ -185,6 +187,7 @@ fQuery contains 3 shortcut objects:
 * `fQuery.iterators`
 * `fQuery.funcs`
 * `fQuery.alias`
+
 When a string is passed in, the first thing that is done is these 3 objects are checked to see if the string you have passed in matches any of the keys in any of these objects. The first object to contain a matching key is the one that gets used, if any. This means that if `iterators` and `alias` both had a key of the same name, then the one in `iterators` would always get picked.
 
 ##### `iterators`
@@ -196,8 +199,10 @@ function not(el, i, sel){
     var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
     return !match.call(el, sel);
 },
+
 // normal usage, as shown in "When `action` is `function`"
 fQuery('div')(not, '.foo');
+
 // if we want the "not" function to be available everywhere, we can just:
 fQuery.iterators.not = not;
 // then use it by doing the following, which does the exact same as above
@@ -208,14 +213,16 @@ fQuery('div')('not', '.foo');
 ##### `funcs`
 These ones act very differently to the other two objects. The other two are just to make normal use of fQuery more convenient, but this one enables new functionality.
 
-Functions on `funcs` will be called by `fQuery.doAction` with `this` bound as the `this` array from `doAction`, and with `acargs` passed in as a list of arguments.
+Functions on `funcs` will be called **once** by `fQuery.doAction`, with the `this` array passed in as the first argument, and `acargs` passed in as a list of arguments after that.
 
-The return of the called `funcs` function will be the return of `doAction`
+So, unlike with the functions in `iterators` where the function is called once for every element, the functions in `funcs` are only called once when 
+
+The return of the called `funcs` function will be the return of `doAction`, making it useful for when you want to add some kind of bespoke functionality, that doesn't already exist in the DOM or fQuery.
 ```javascript
 // Can check whether a bound array contains a specific element
 // this is one of the preconfigured ones, so no need to do this bit yourself if you like it
-fQuery.funcs.has = function(val){
-    return this.indexOf(val) > -1;
+fQuery.funcs.has = function(arr, val){
+    return arr.indexOf(val) > -1;
 }
 // checks whether the bound array contains document.body
 // returns false
@@ -256,7 +263,7 @@ fQuery.alias = {
 #### When `action` is `string` - element properties and functions
 If none of the above shortcut objects are matched, then the string will be used to get properties of the elements in the `this` array. Below are the rules that govern that process:
 
-Another shortcut object is invoked, called `fQuery.propalias`. `alias` requires that the passed string fully matches one of the items, but `propalias` matches by segments of the property name. For example, `data: "dataset"` is one of the propaliases, meaning you can do `$('div')('data.foo')` instead of `$('div')('dataset.foo')`
+Another shortcut object is invoked, called `fQuery.propalias`. `alias` requires that the passed string fully matches one of the items, but `propalias` matches by segments of the property name. For example, `data: "dataset"` is one of the propaliases, meaning you can do `fQuery('div')('data.foo')` instead of `fQuery('div')('dataset.foo')`
 ```javascript
 // default propalias object at time of writing
 // 0 denotes the first portion of the property string, each portion is delimited by a .
@@ -275,15 +282,15 @@ If the string refers to a property that is not a function, and `acargs[0]` is de
 * If `acargs[0]` is a function, then it is used as a setter for the property for every element - the property is set to the return value of the function. Example:
 ```javascript
 // Adds the index of the input to the value of every input
-$('input')('val', (val, i) => val+i);
+fQuery('input')('val', (val, i) => val+i);
 ```
 The callback takes the following arguments: Current property value, Current Index, Object that has the property, Current item in the `this` array, ...acargs
-* If the string refers to a property that is an object, and `acargs[0]` is an object, then the properties of the property are made to match `acargs[0]` (*I think*)
+* If the string refers to a property that is an object, and `acargs[0]` is an object, then the properties of the property are made to match `acargs[0]`, to allow you to modify things like the `dataset` or `style` properties easily
 ```javascript
 // sets element.dataset.foo = "bar" for every item
-$('div')('dataset', {foo:"bar"});
+fQuery('div')('dataset', {foo:"bar"});
 // CSS, you know this
-$('div')('style', {border:"1px solid black"});
+fQuery('div')('style', {border:"1px solid black"});
 ```
 * Otherwise, the property is set to the value of `acargs[0]`
 
