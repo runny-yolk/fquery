@@ -75,7 +75,7 @@ void function(){
             var al = fQuery.alias[action];
 
             if(type(itr) === 'function') action = itr;
-            else if(type(fu) === 'function') return fu.apply(this, acargs);
+            else if(type(fu) === 'function') return fu.apply(0, [this].concat(acargs));
             else if(al !== undefined) {
                 if(type(al) === 'function') al = al.apply(0, acargs);
 
@@ -97,7 +97,7 @@ void function(){
                 }
                 return fQuery(rtn);
             }
-            else return doAction.apply(action.shift(), action.concat(acargs));
+            else return doAction.apply(this, action.concat(acargs));
         }
 
         atype = tCheck(action, 'Action', 'number function string');
@@ -302,25 +302,25 @@ void function(){
     }
     
     fQuery.funcs = {
-        '?': function(){
-            return Boolean(this[0]);
+        '?': function(arr){
+            return Boolean(arr[0]);
         },
-        has: function(val){
-            return this.indexOf(val) > -1;
+        has: function(arr, val){
+            return arr.indexOf(val) > -1;
         },
-        index: function(){
-            var el = this[0];
+        index: function(arr){
+            var el = arr[0];
             if(!el || !el.parentElement) return -1;
             return toArr(el.parentElement.children).indexOf(el);
         },
-        parents: function(sel, not){
+        parents: function(arr, sel, not){
             if(typeof sel !== 'string') sel = undefined;
             if(not !== true) not = false;
             var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
 
             var rtn = [];
-            for (var i = 0; i < this.length; i++) {
-                var el = this[i];
+            for (var i = 0; i < arr.length; i++) {
+                var el = arr[i];
                 var parent = el.parentElement;
                 while(parent){
                     if(rtn.indexOf(parent) < 0) {
