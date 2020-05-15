@@ -20,7 +20,6 @@ The first is by providing a wrapper function, `fQuery.doAction`, for all changes
 
 This function is primarily designed to take a string as its first argument, called `action`. `action` typically refers to a property or method of the elements in the `this` array that you want to interact with. For example, if I wanted to use fQuery to add a class `foo` to every `div` on a page, I could do something like this:
 ```javascript
-var $ = fQuery;
 fQuery('div')('classList.add', 'foo');
 ```
 
