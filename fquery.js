@@ -20,7 +20,7 @@ void function(){
     var getProto = Object.getPrototypeOf;
     var type = function(x){
         if(Array.isArray(x)) return 'array';
-        if(x === null) return 'null';
+		if(x === null) return 'null';
 
         var xtype = typeof x;
         if(xtype === 'object') {
@@ -213,17 +213,71 @@ void function(){
     fQuery.doAction = doAction;
     
 
-    fQuery.propalias = {
-        0: {
-            css: 'style',
-            data: 'dataset',
-            parent: 'parentElement',
+    fQuery.iterators = {
+        not: function(el, i, sel){
+            // IE compat
+            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
+            return !match.call(el, sel);
+        },
+        remove: function(el){
+            if(el.parentNode) el.parentNode.removeChild(el);
+        },
+        run: function(el, i, ename, einit){
+            tCheck(ename, 'Event Name', 'string');
+            if(window.Event) {
+                ename.split(' ').forEach(function(x){
+                    el.dispatchEvent(new Event(x, einit));
+                });
+            }
+            else console.error('IE does not support the Event constructor, but does support document.createEvent, figure it out (sorry)');
+        },
+        observe: function(el, i, opts, cb){
+            new MutationObserver(cb).observe(el, opts);
+        },
+        contains: function(el, i, reg){
+            return Boolean( el.textContent.match(reg) );
+        }
+    }
+    
+    fQuery.funcs = {
+        '?': function(arr){
+            return Boolean(arr[0]);
+        },
+        has: function(arr, val){
+            return arr.indexOf(val) > -1;
+        },
+        index: function(arr){
+            var el = arr[0];
+            if(!el || !el.parentElement) return -1;
+            return toArr(el.parentElement.children).indexOf(el);
+        },
+        parents: function(arr, sel, not){
+            if(typeof sel !== 'string') sel = undefined;
+            if(not !== true) not = false;
+            // IE compat
+            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
+
+            var rtn = [];
+            for (var i = 0; i < arr.length; i++) {
+                var el = arr[i];
+                var parent = el.parentElement;
+                while(parent){
+                    if(rtn.indexOf(parent) < 0) {
+                        if(sel){
+                            if(not) !match.call(parent, sel) && rtn.push(parent);
+                            else match.call(parent, sel) && rtn.push(parent);
+                        }
+                        else rtn.push(parent);
+                    }
+                    parent = parent.parentElement;
+                }
+            }
+            return fQuery(rtn);
         }
     }
 
-
     var getInsert = function(item, safety){
-		safety = safety || true;
+		if(safety !== true) safety = false;
         var itype = type(item),
             pos = this;
 
@@ -273,68 +327,13 @@ void function(){
         append: getInsert.bind('beforeend'),
         after: getInsert.bind('afterend'),
         clone: function(deep){ if(deep !== false) deep = true; return ['cloneNode', deep]; }
-    }
-
-    fQuery.iterators = {
-        not: function(el, i, sel){
-            // IE compat
-            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
-            return !match.call(el, sel);
-        },
-        remove: function(el){
-            if(el.parentNode) el.parentNode.removeChild(el);
-        },
-        run: function(el, i, ename, einit){
-            tCheck(ename, 'Event Name', 'string');
-            if(window.Event) {
-                ename.split(' ').forEach(function(x){
-                    el.dispatchEvent(new Event(x, einit));
-                });
-            }
-            else console.error('IE does not support the Event constructor, but does support document.createEvent, figure it out (sorry)');
-        },
-        observe: function(el, i, opts, cb){
-            new MutationObserver(cb).observe(el, opts);
-        },
-        contains: function(el, i, reg){
-            return Boolean( el.textContent.match(reg) );
+	}
+	
+    fQuery.propalias = {
+        0: {
+            css: 'style',
+            data: 'dataset',
+            parent: 'parentElement',
         }
     }
-    
-    fQuery.funcs = {
-        '?': function(arr){
-            return Boolean(arr[0]);
-        },
-        has: function(arr, val){
-            return arr.indexOf(val) > -1;
-        },
-        index: function(arr){
-            var el = arr[0];
-            if(!el || !el.parentElement) return -1;
-            return toArr(el.parentElement.children).indexOf(el);
-        },
-        parents: function(arr, sel, not){
-            if(typeof sel !== 'string') sel = undefined;
-            if(not !== true) not = false;
-            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
-
-            var rtn = [];
-            for (var i = 0; i < arr.length; i++) {
-                var el = arr[i];
-                var parent = el.parentElement;
-                while(parent){
-                    if(rtn.indexOf(parent) < 0) {
-                        if(sel){
-                            if(not) !match.call(parent, sel) && rtn.push(parent);
-                            else match.call(parent, sel) && rtn.push(parent);
-                        }
-                        else rtn.push(parent);
-                    }
-                    parent = parent.parentElement;
-                }
-            }
-            return fQuery(rtn);
-        }
-    }
-
 }();
