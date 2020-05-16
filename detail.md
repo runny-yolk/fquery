@@ -1,6 +1,6 @@
 # fQuery in Detail
 
-This is the comprehensive documentation for the inner workings of fQuery. Read this if you want to fully understand it, otherwise, refer to the main README.md for general usage.
+This is the comprehensive documentation for the inner workings of fQuery. Read this if you want to fully understand it, otherwise, refer to the main [README.md](/README.md) for general usage.
 
 ## fQuery(input\[, context\])
 
