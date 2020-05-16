@@ -3,6 +3,8 @@ Fake-jQuery. A JS tool designed to replicate a good portion of the functionality
 
 Useful if you need a thin utility for prototyping, or you're building A/B tests for the web, and need utilities, and don't want to add too much bulk. It's also highly extensible.
 
+This guide is for basic usage. If you want a better understanding of how fQuery works, please refer to [detail.md](/detail.md)
+
 ## How to use it
 The fQuery function is put on the global variable `fQuery`. For a more jQuery-like experience, you could do `window.$ = fQuery`. This isn't done by default, to make fQuery non-conflicting by default.
 
