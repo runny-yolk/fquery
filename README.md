@@ -49,4 +49,4 @@ fQuery('input[type=text]')('val', 'foo');
 fQuery('input[type=text]')('val');
 ```
 
-Because you can pass in strings to reference properties, fQuery is adaptable to a wide range of use cases, with minimal impact on page load, because there's no need to manually define getters/setters.
+Because you can pass in strings to reference properties, fQuery is adaptable to a wide range of use cases, with minimal impact on page load, because there's no need for getters/setters to be predefined.
