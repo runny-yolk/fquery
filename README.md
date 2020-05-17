@@ -156,7 +156,7 @@ fQuery('.containers')('getAttribute', 'data-val');
 fQuery('.containers')('att', 'data-val');
 ```
 
-No matter what property you're getting, fQuery will always take the value from the first element and return it.
+No matter what property you're getting, fQuery will always take the value from the first element and return it, for the sake of consistency and ease of implementation.
 
 #### Getters (Chainable)
 
@@ -207,9 +207,111 @@ fQuery('.containers')('html', 'some new HTML')('html', function(currentValue, i,
 fQuery('.containers')('css', {background:'red'});
 ```
 
-### Refining selections
-
 ### Iterating selections
+
+To iterate a selection, you can just provide a function to `doAction`:
+```javascript
+// iterate and log all the divs
+jQuery('div').each(function(i, el){
+	// note the order of the index and object arguments is inconsistent with ECMAscript functions such as Array.prototype.forEach and Array.prototype.map
+	console.log(el);
+});
+
+// iterate and log all the divs
+fQuery('div')(function(el, i){
+	console.log(el);
+});
+```
+
+You might want to iterate a selection to apply the same change to a bunch of elements, but using functionality fQuery doesn't have in its basic framework. For example, creating a set of MutationObservers to observe DOM changes on the selected elements:
+```javascript
+// observes DOM changes inside all divs and log them
+fQuery('div')(function(el, i){
+	new MutationObserver( console.log ).observe(el, {childList:true});
+});
+
+function observe(el, i, opts, cb){
+	new MutationObserver(cb).observe(el, opts);
+}
+// observes DOM changes inside all divs and log them
+// this time, by passing in the options and callback as parameters
+fQuery('div')(observe, {childList:true}, console.log);
+
+fQuery.iterators.observe = function (el, i, opts, cb){
+	new MutationObserver(cb).observe(el, opts);
+}
+// observes DOM changes inside all divs and log them
+// this time, by passing in the options and callback as parameters
+// and now that observe is on the iterators object, it can be called from anywhere, by using its name in a string
+fQuery('div')('observe', {childList:true}, console.log);
+```
+
+### Refining selections, and extending fQuery's functionality
+
+You can refine your selection by index just by passing in a number to `doAction`:
+```javascript
+// changes the selection from all divs to just the first div
+jQuery('div').eq(0);
+// changes the selection from all divs to just the third div
+jQuery('div').eq(2);
+
+// changes the selection from all divs to just the first div
+fQuery('div')(0);
+// changes the selection from all divs to just the third div
+fQuery('div')(2);
+```
+
+Or by using a range of indexes, as with `Array.prototype.slice`:
+```javascript
+// changes the selection from all divs to 2nd div - last div
+jQuery('div').slice(1);
+// changes the selection from all divs to 1st div - 3rd div
+jQuery('div').slice(0, 2);
+// changes the selection from all divs to 2nd div - div 1 before last
+jQuery('div').slice(1, -1);
+
+// changes the selection from all divs to 2nd div - last div
+fQuery('div')(1, null);
+// changes the selection from all divs to 1st div - 3rd div
+fQuery('div')(0, 2);
+// changes the selection from all divs to 2nd div - div 1 before last
+fQuery('div')(1, -1);
+```
+
+Note that if you want to use `slice` functionality without specifying a second argument, `null` has to be passed explicitly as the second argument. This is to differentiate it from the syntax used to select a single index.
+
+You might want to filter elements based on an arbitrary conditions, instead of just by number. fQuery doesn't have a way of doing this as part of its basic framework, but it does have an object called `fQuery.funcs` that makes it easy to extend fQuery's default functionality. `funcs`, by default, is configured with a `filter` function.
+
+```javascript
+// filters the selection to only divs that have the containers class
+jQuery('div').filter('.containers');
+// filters the selection to only divs that have the attribute data-foo with value "true"
+jQuery('div').filter(function(el, i){
+	return el.dataset.foo = 'true';
+});
+
+// filters the selection to only divs that have the containers class
+fQuery('div')('filter', '.containers');
+// filters the selection to only divs that have the attribute data-foo with value "true"
+fQuery('div')('filter', function(el, i){
+	return el.dataset.foo = 'true';
+});
+```
+
+You might also want a function to check if a specific element is in your selection. Here's how you'd add that functionality to fQuery:
+```javascript
+// arr is the array of the currently selected elements
+// val is passed in when the function is called
+// functions in funcs are only called once when invoked
+fQuery.funcs.has = function(arr, val){
+	return arr.indexOf(val) > -1;
+}
+
+// returns false - the body element would not be in a selection of divs
+fQuery('div')('has', document.body);
+```
+
+`has` is configured for you, so you don't have to add it yourself if you want to use it, I'm just using it here for example purposes.
 
 ### Chaining details
 
