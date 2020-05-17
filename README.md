@@ -202,12 +202,12 @@ fQuery('.containers')('css', {background:'red'});
 
 ### Chaining details
 
-In *general* `doAction` will return another `doAction` (i.e. be chainable) when you . . :
+In *general* `doAction` will return another `doAction` (i.e. be chainable) when you. . :
 * Are doing something that makes a change to the selected elements (like adding/removing classes, setting HTML/text/values etc)
 * Are getting an element, or list of elements, (or invoking a function that returns either of these) from the selected elements, the elements you're getting become the selected elements (so, `fQuery('input')('parent')` changes the selection from the inputs to the parents of all the inputs, or `fQuery('form')('find', 'input')` changes the selection from the form elements to the inputs inside the form elements)
 * Pass in a number or a function as an argument
 
-In *general* `doAction` will **not** return another `doAction` (i.e. **not** be chainable) when you . . :
+In *general* `doAction` will **not** return another `doAction` (i.e. **not** be chainable) when you. . :
 * Are getting a property of an element that is **not** another element or a list of some kind (like `value`, `innerHTML`, or `scrollTop`). In this case, `doAction` will get the property value from the first element and return it.
 * Pass no arguments to `doAction` (i.e. `fQuery('.containers')()`) in which case, the array of selected elements is returned.
 
