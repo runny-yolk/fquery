@@ -226,25 +226,45 @@ void function(){
         },
         observe: function(el, i, opts, cb){
             new MutationObserver(cb).observe(el, opts);
-        },
-        contains: function(el, i, reg){
-            return Boolean( el.textContent.match(reg) );
         }
     }
     
     fQuery.funcs = {
-        not: function(arr, sel){
-            // IE compat
-            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
+        contains: function(arr, reg){
             return this.filter(arr, function(el){
-                return !match.call(el, sel);
-            });
+				return Boolean( el.textContent.match(reg) );
+			});
         },
         filter: function(arr, cb){
-            var rtn = [];
-            for(var i = 0; i < arr.length; i++) if(cb(arr[i], i) !== false) rtn.push(arr[i]);
+            // IE compat
+            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
+			var rtn = [];
+			var sel;
+			if(typeof cb === 'string') {
+				sel = cb;
+				cb = function(el){
+					return match.call(el, sel);
+				}
+			}
+            for(var i = 0; i < arr.length; i++) if(cb(arr[i], i)) rtn.push(arr[i]);
             return fQuery(rtn);
-        },
+		},
+		'!filter': function(arr, cb){
+			var rtn = [];
+			
+            // IE compat
+            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
+			var sel;
+			if(typeof cb === 'string') {
+				sel = cb;
+				cb = function(el){
+					return match.call(el, sel);
+				}
+			}
+
+            for(var i = 0; i < arr.length; i++) if(!cb(arr[i], i)) rtn.push(arr[i]);
+            return fQuery(rtn);
+		},
         '?': function(arr){
             return Boolean(arr[0]);
         },
