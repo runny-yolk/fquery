@@ -122,7 +122,7 @@ The third thing to take note of is that jQuery returns an object, so requires yo
 
 ### Getters/Setters
 
-#### Getters
+#### Getters (Not chainable)
 You can get or set any property of any element in your selection, just by using the property name. This also works for functions that act as getters.
 
 ```javascript
@@ -156,7 +156,11 @@ fQuery('.containers')('getAttribute', 'data-val');
 fQuery('.containers')('att', 'data-val');
 ```
 
-No matter what property you're getting, fQuery will always take the value from the first element and return it. The exception to this is if the property is an element, an array, or an array-like object (an object with a property called `length` of type `number`)
+No matter what property you're getting, fQuery will always take the value from the first element and return it.
+
+#### Getters (Chainable)
+
+The exception to this is if the property is an element, an array, or an array-like object (an object with a property called `length` of type `number`)
 
 ```javascript
 // jQuery
@@ -179,7 +183,7 @@ fQuery('.containers')('parent')('+class', 'containers-parents');
 fQuery('form')('kids');
 ```
 
-#### Setters
+#### Setters (Chainable)
 
 Just as you can use fQuery to get any element property, you can use it to set them as well. There are 3 ways of doing this.
 
@@ -191,6 +195,11 @@ fQuery('.containers')('html', 'some new HTML');
 fQuery('.containers')('html', function(currentValue, i, element){
     return currentValue+i;
 });
+// instead of writing the above seperately, they could also be written like
+fQuery('.containers')('html', 'some new HTML')('html', function(currentValue, i, element){
+    return currentValue+i;
+});
+
 // sets the style of containers to have a red background
 // css is an alias for style
 // note that unlike jQuery, this will replace the existing style, not add to it
