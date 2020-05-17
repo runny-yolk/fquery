@@ -162,6 +162,8 @@ No matter what property you're getting, fQuery will always take the value from t
 // jQuery
 // changes the selection to the parent of each selected element, making sure the new selection doesn't contain any duplicates
 jQuery('.containers').parent();
+// adds class containers-parents to the parents
+jQuery('.containers')('parent').addClass('containers-parents');
 // changes the selection to the children of each selected element, while ensuring no duplicates
 jQuery('form').children();
 
@@ -169,8 +171,8 @@ jQuery('form').children();
 // changes the selection to the parent of each selected element, making sure the new selection doesn't contain any duplicates
 // parent is an alias for parentElement
 fQuery('.containers')('parent');
-// adds class to the parent
-fQuery('.containers')('parent')('+class', '.containers-parents');
+// adds class containers-parents to the parents
+fQuery('.containers')('parent')('+class', 'containers-parents');
 // changes the selection to the children of each selected element, while ensuring no duplicates
 // kids is an alias for children
 // children is an array-like object that contains a list of child elements
@@ -209,6 +211,7 @@ In *general* `doAction` will return another `doAction` (i.e. be chainable) when 
 
 In *general* `doAction` will **not** return another `doAction` (i.e. **not** be chainable) when you. . :
 * Are getting a property of an element that is **not** another element or a list of some kind (like `value`, `innerHTML`, or `scrollTop`). In this case, `doAction` will get the property value from the first element and return it.
+* Are calling a function of an element that does **not** return another element or a list of some kind (like `getBoundingClientRect`, `getAttribute`). In this case, `doAction` will get the return value from the first element and return it.
 * Pass no arguments to `doAction` (i.e. `fQuery('.containers')()`) in which case, the array of selected elements is returned.
 
 If you want more detail on the above, or are experiencing unexpected behaviour, please refer to the end of [detail.md](/detail.md) for more info on this topic
