@@ -34,6 +34,7 @@ void function(){
     var tCheck = function(val, thing, types, opts){
         if(typeof thing !== 'string' || typeof types !== 'string') throw new TypeError('thing and types must be string');
         var defOpts = {
+            optional: false,
             advanced: true,
             warn: true,
         }
@@ -75,12 +76,11 @@ void function(){
             var al = fQuery.alias[action];
 
             if(type(itr) === 'function') action = itr;
-            else if(type(fu) === 'function') return fu.apply(0, [this].concat(acargs));
+            else if(type(fu) === 'function') return fu.apply(fQuery.funcs, [this].concat(acargs));
             else if(al !== undefined) {
                 if(type(al) === 'function') al = al.apply(0, acargs);
 
-                tCheck(al, 'Alias', 'string array');
-                action = al;
+                if(tCheck(al, 'Alias', 'string array', {optional:true})) action = al;
             }
         }
 
@@ -113,10 +113,8 @@ void function(){
             else return fQuery(this.slice(num, end));
         }
         else if(atype === 'function'){
-            var cb = action;
-            var rtn = [];
-            for(var p = 0; p < this.length; p++) if(cb.apply(0, [this[p], p].concat(acargs)) !== false) rtn.push(this[p]);
-            return fQuery(rtn);
+            for(var p = 0; p < this.length; p++) action(this[p], p);
+            return fQuery(this);
         }
 
         var props = action.split('.');
@@ -172,7 +170,7 @@ void function(){
                 if(rtntype === 'element') ac = [ac];
               
                 if(!rtnarr) rtnarr = [];
-                rtnarr = pushUnique(rtnarr, ac);
+                pushUnique(rtnarr, ac);
             }
             else if(props.length > 1 && !isfunc) return ac;
             else if (ac !== undefined) return ac;
@@ -214,11 +212,6 @@ void function(){
     
 
     fQuery.iterators = {
-        not: function(el, i, sel){
-            // IE compat
-            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
-            return !match.call(el, sel);
-        },
         remove: function(el){
             if(el.parentNode) el.parentNode.removeChild(el);
         },
@@ -240,6 +233,18 @@ void function(){
     }
     
     fQuery.funcs = {
+        not: function(arr, sel){
+            // IE compat
+            var match = Element.prototype.matches || Element.prototype.msMatchesSelector;
+            return this.filter(arr, function(el){
+                return !match.call(el, sel);
+            });
+        },
+        filter: function(arr, cb){
+            var rtn = [];
+            for(var i = 0; i < arr.length; i++) if(cb(arr[i], i) !== false) rtn.push(arr[i]);
+            return fQuery(rtn);
+        },
         '?': function(arr){
             return Boolean(arr[0]);
         },
@@ -334,6 +339,9 @@ void function(){
             css: 'style',
             data: 'dataset',
             parent: 'parentElement',
+        },
+        1: {
+            children: 'kids'
         }
     }
 }();
