@@ -246,7 +246,7 @@ fQuery('div')('style', {border:"1px solid black"});
 
 If the string refers to a function, then `acargs` is used as a list of arguments to call that function.
 
-If the string refers to *a function that returns, or a property that is* an element, an array, or an array-like object (such as a `NodeList`), then for every element in the `this` array, a return array will be added to, built from the values/return values of the property, with duplicates filtered out. `doAction` will then return with another instance of `doAction`, with the return array bound as `this`. This rule is what allows `querySelectorAll`, `children`, `parentElement`, etc, to work.
+If the string refers to *a function that returns, or a property that is* an element, an array, or an array-like object (such as a `NodeList`), then for every element in the `this` array, a return array will be added to, built from the values/return values of the property, with duplicates filtered out. `doAction` will then return with another instance of `doAction`, with the return array bound as `this`. This rule is what allows `querySelectorAll`, `children`, `parentElement`, etc, to work. The only exception to this rule is `insertAdjacentElement`, which is inconsistent with the other `insertAdjacent` APIs, in that it returns the inserted element. fQuery knows this, and treats `insertAdjacentElement` as if it returns `undefined`, same as the other `insertAdjacent` APIs.
 
 `doAction` will only return the result of a function call when the function is a property of the element directly, not when the function is a property of a property of the element. For example, `querySelectorAll` will work as described above, but `firstChild.querySelectorAll` will not.
 
