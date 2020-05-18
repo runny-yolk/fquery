@@ -122,9 +122,9 @@ The third thing to take note of is that jQuery returns an object, so requires yo
 
 ### Getters/Setters
 
-#### Getters (Not chainable)
 You can get or set any property of any element in your selection, just by using the property name. This also works for functions that act as getters.
 
+#### Getters (Not chainable)
 ```javascript
 // DOM API
 // Gets positional data for the first container
@@ -160,7 +160,7 @@ No matter what property you're getting, fQuery will always take the value from t
 
 #### Getters (Chainable)
 
-The exception to this is if the property is an element, an array, or an array-like object (an object with a property called `length` of type `number`)
+The exception to the above is if the property is an element, an array, or an array-like object (an object with a property called `length` of type `number`)
 
 ```javascript
 // jQuery
