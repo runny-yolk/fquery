@@ -1,7 +1,7 @@
 # fQuery
 Fake-jQuery. A JS tool designed to replicate a good portion of the functionality of jQuery, with reduced impact on page load.
 
-dom-hyperscript.js is also included in this repo. It's a small utility that makes it easier to create DOM elements, and much like fQuery, takes a lot of the pain out of interfacing with the DOM. It's too small to justify its own repo, it's very simple, and it pairs well with fQuery, so it's kept here. It isn't dependent on fQuery, fQuery isn't dependent on it.
+dom-hyperscript.js is also included in this repo. It's a small utility that makes it easier to create DOM elements, and much like fQuery, takes a lot of the pain out of interfacing with the DOM. It's too small to justify its own repo, it's very simple, and it pairs well with fQuery, so it's kept here. You don't need it to use fQuery, and you don't need fQuery to use it.
 
 Useful if you need a thin utility for prototyping, or you're building A/B tests for the web, and need utilities, and don't want to add too much bulk. It's also highly extensible.
 
