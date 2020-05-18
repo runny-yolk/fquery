@@ -75,8 +75,6 @@ Returns an instance of the `fQuery.doAction` function, with an array of elements
 `action` is used as a callback function to iterate through each element in the list. The first two arguments provided to the callback are always the current element, and the index of that element in the `this` array.
 
 The `acargs` array is then used to populate the rest of the arguments to the callback, i.e., arguments provided after the callback are then passed to the callback, just like how arguments passed after the 2nd argument of `setTimeout` are then passed to the callback.
-
-If the callback returns `false` (and it has to be the `boolean false`, not just a falsy value like `0` or `null`), then that element will not be included the array that gets bound to the return instance of `doAction`, making the function act like an iterator and a filter. If you're intending on using the function just as an iterator, make sure it never returns `false`
 ```javascript
 // returns a doAction instance where the "this" array contains all divs on the page
 var $divs = fQuery('div');
@@ -90,12 +88,6 @@ function logProp(el, i, prop){
   console.log(el[prop]);
 }
 $divs(logProp, "id");
-
-// will filter element array to elements that have at least one child
-function filterByChildNumber(el, i, childNumber){
-  return el.children > childNumber;
-}
-$divs(filterByChildNumber, 1);
 ```
 
 ### When `action` is `array`
@@ -165,7 +157,7 @@ These ones act very differently to the other two objects. The other two are just
 
 Functions on `funcs` will be called **once** by `fQuery.doAction`, with the `this` array passed in as the first argument, and `acargs` passed in as a list of arguments after that.
 
-So, unlike with the functions in `iterators` where the function is called once for every element, the functions in `funcs` are only called once when 
+So, unlike with the functions in `iterators` where the function is called once for every element, the functions in `funcs` are only called once when invoked.
 
 The return of the called `funcs` function will be the return of `doAction`, making it useful for when you want to add some kind of bespoke functionality, that doesn't already exist in the DOM or fQuery.
 ```javascript
