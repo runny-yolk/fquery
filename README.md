@@ -289,6 +289,8 @@ jQuery('div').filter('.containers');
 jQuery('div').filter(function(el, i){
 	return el.dataset.foo = 'true';
 });
+// filters the selection to only divs that do not have the containers class
+jQuery('div').not('.containers');
 
 // filters the selection to only divs that have the containers class
 fQuery('div')('filter', '.containers');
@@ -296,6 +298,9 @@ fQuery('div')('filter', '.containers');
 fQuery('div')('filter', function(el, i){
 	return el.dataset.foo = 'true';
 });
+// filters the selection to only divs that do not have the containers class
+// will also work with a callback
+fQuery('div')('!filter', '.containers');
 ```
 
 You might also want a function to check if a specific element is in your selection. Here's how you'd add that functionality to fQuery:
